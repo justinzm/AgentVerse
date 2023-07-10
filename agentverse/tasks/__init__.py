@@ -17,3 +17,5 @@ from .sde_team.sde_team_3players.output_parser import SdeTeamParser
 from .sde_team.sde_team_2players.output_parser import SdeTeamGivenTestsParser
 
 from .alice_home.output_parser import AliceHomeParser
+from .traffic_junction.output_parser import TrafficParser
+
