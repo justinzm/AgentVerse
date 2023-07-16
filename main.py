@@ -12,6 +12,8 @@ parser = ArgumentParser()
 #parser.add_argument("--task", type=str, default="nlp_classroom_3players")
 
 parser.add_argument("--task", type=str, default="traffic_junction")
+# parser.add_argument("--task", type=str, default="combat_task")
+# parser.add_argument("--task", type=str, default="hunting_task")
 
 # parser.add_argument("--task", type=str, default="sde_team")
 # parser.add_argument("--task", type=str, default="sde_team/sde_team_2players")

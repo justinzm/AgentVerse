@@ -1,0 +1,168 @@
+prompts:
+  prompt: &prompt |-
+    Now you are playing a combat game in a 17 * 17 grids. There are two opposing teams, and you control one of them. Each team has five bots which can move and attack enemy bots within their firing range, and the bots in your team are the agents.
+
+    The game ends when all the bots in one of the two teams die within 10 time steps, or the game reach 10 time steps. Your goal is to win the game, which means, at the end of the game, there are fewer enemy bots surviving or all enemy bots die.
+
+    Before the ten bots are placed, the 17 * 17 grids can be represented by the following matrix:
+    [[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]]
+    The coordinate of top left corner is [0,0], and the coordinate of the bottom right corner is [16,16]. 0 in the matrix means that the bots can move to the corresponding position in the grids, and -1 means that the bots can not move to the corresponding position, which is the edge of the grids.
+
+    In terms of how you actually control the bots in your team, you take actions for the agents by calling functions. Currently, there are the following functions that can be called.
+    - attack(bot): 
+      In attack(bot), `bot` describes the name of the target bot, and the agent will make the target bot lose 1 health points. Each bot starts with 3 health points, and the bots with 0 health points will die. The agents can also be attacked by enemy bots. The bot cannot attack at the step after attacking. Every bot can only attack enemy bots in the other eight locations of the 3 * 3 grids centered around it, which is its firing range, as shown in the matrix below.
+      [[0, 0, 0],
+       [0, 1, 0],
+       [0, 0, 0]]
+      If the bot is in the position represented by 1 in the matrix, it can only attack the eight positions represented by 0 in the matrix.
+    - move(direction): 
+      In move(direction), `direction` describes the direction you are going to move to, and it can only be one of the following four lists: "up", "down", "left", "right", which mean four different direction respectively.
+    - stay(): 
+      In stay(), the agent do nothing.
+
+    Call one function at a time, please give a thought before calling these actions .
+    For examples:
+
+    [OPTION 1]
+    Thought: I am now at the coordinate [1,4], and there is no bot at [2,4]. If I move(up), I will reach [0,4], which is not allowed, so I will move(down).
+    Action: move(down)
+
+    [OPTION 2]
+    Thought: I am now at the coordinate [3,3], and I can attack at his step, and enemy_1 is at [4,4]. If I attack(1), enemy_1 will lose 1 health point, so I will attack(1).
+    Action: attack(enemy_1)
+
+    [OPTION 3]
+    Thought: I am now at the coordinate [2,3], and I cannot attack at his step, and enemy_1 is at [3,4], and there is no bot at [2,2]. If it attacks me, I will lose 1 health point, so I will move(left).
+    Action: move(left)
+
+    [OPTION 4]
+    Thought: I am now at the coordinate [2,3], and I cannot attack at his step, and enemy_1 is at [3,5], and there is no bot at [2,2]. If I move(right), I may be attacked, so I will move(down).
+    Action: move(left)
+
+    [OPTION 5]
+    Thought: I am now at the coordinate [3,4], and I cannot attack at his step, and enemy_1 is at [2,2], and enemy_2 is at [1,5], and enemy_3 is at [4,6], and enemy_4 is at [5,3]. If I move(left) or move(right) or move(up) or move(down), I may be attacked, so I will stay().
+    Action: stay()
+
+    [OPTION 6]
+    Thought: I am now at the coordinate [2,4], and there is no bot at [3,4]. I am not sure what to do, and I prefer to move to the center of the grids, so I will move(down).
+    Action: move(down)
+
+
+    ${role_description}
+
+    Here is other bots' action history so far:
+    ${chat_history}
+    ${env_description}
+
+    Pay attention to other bots' action history and try to figure out their intention of next movement.
+
+    Your current coordinate is ${coordinate}. Other agents' coordinates are ${others_coordinates}. Your enemy bots' coordinates are ${enemys_coordinates}. 
+
+    What will you, ${agent_name}, do next?
+
+environment:
+  env_type: combat
+  max_turns: 10
+  grids_dim: 17
+  rule:
+    order:
+      type: sequential
+    visibility:
+      type: oneself
+    selector:
+      type: basic
+    updater:
+      type: combat_all
+    describer:
+      type: basic
+
+agents:
+  - agent_type: combat
+    name: bot_1
+    coordinate: [2,3]
+    role_description: |-
+      You are bot_1. Your goal is to let your enemy bots die. Other agents are all your teamates.
+      You need to be sensitive to your own coordinate, enemy bots' coordinates and other agents' coordinates, and you cannot move to coordinates with other bots. You should try to attack your enemy bots.
+    memory:
+      memory_type: chat_history
+    prompt_template: *prompt
+    llm:
+      llm_type: gpt-4
+      model: 'gpt-4'
+      temperature: 0.7
+      max_tokens: 256
+  - agent_type: combat
+    name: bot_2
+    coordinate: [5,6]
+    role_description: |-
+      You are bot_2. Your goal is to let your enemy bots die. Other agents are all your teamates.
+      You need to be sensitive to your own coordinate, enemy bots' coordinates and other agents' coordinates, and you cannot move to coordinates with other bots. You should try to attack your enemy bots.
+    memory:
+      memory_type: chat_history
+    prompt_template: *prompt
+    llm:
+      llm_type: gpt-4
+      model: 'gpt-4'
+      temperature: 0.7
+      max_tokens: 256
+  - agent_type: combat
+    name: bot_3
+    coordinate: [8,3]
+    role_description: |-
+      You are bot_3. Your goal is to let your enemy bots die. Other agents are all your teamates.
+      You need to be sensitive to your own coordinate, enemy bots' coordinates and other agents' coordinates, and you cannot move to coordinates with other bots. You should try to attack your enemy bots.
+    memory:
+      memory_type: chat_history
+    prompt_template: *prompt
+    llm:
+      llm_type: gpt-4
+      model: 'gpt-4'
+      temperature: 0.7
+      max_tokens: 256
+  - agent_type: combat
+    name: bot_4
+    coordinate: [11,6]
+    role_description: |-
+      You are bot_4. Your goal is to let your enemy bots die. Other agents are all your teamates.
+      You need to be sensitive to your own coordinate, enemy bots' coordinates and other agents' coordinates, and you cannot move to coordinates with other bots. You should try to attack your enemy bots.
+    memory:
+      memory_type: chat_history
+    prompt_template: *prompt
+    llm:
+      llm_type: gpt-4
+      model: 'gpt-4'
+      temperature: 0.7
+      max_tokens: 256
+  - agent_type: combat
+    name: bot_5
+    coordinate: [14,3]
+    role_description: |-
+      You are bot_5. Your goal is to let your enemy bots die. Other agents are all your teamates.
+      You need to be sensitive to your own coordinate, enemy bots' coordinates and other agents' coordinates, and you cannot move to coordinates with other bots. You should try to attack your enemy bots.
+    memory:
+      memory_type: chat_history
+    prompt_template: *prompt
+    llm:
+      llm_type: gpt-4
+      model: 'gpt-4'
+      temperature: 0.7
+      max_tokens: 256
+
+
+tools:

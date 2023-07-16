@@ -10,5 +10,7 @@ from .sde_team import SdeTeamUpdater
 from .pokemon import PokemonUpdater
 
 from .traffic_all import TrafficAllUpdater
+from .combat_all import CombatAllUpdater
+from .hunting_all import HuntingAllUpdater
 
 

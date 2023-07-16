@@ -11,4 +11,6 @@ from .prisoner_dilemma_agent import PoliceAgent, PrisonerAgent
 from .reflection_agent import ReflectionAgent
 
 from .traffic_agent import TrafficAgent
+from .combat_agent import CombatAgent
+from .hunting_agent import HuntingAgent
 

@@ -1,0 +1,244 @@
+prompts:
+  predator_prompt: &predator_prompt |-
+    You are in a hunting game as a predator in a 12 * 12 grids, and there are totally 3 predators (including you) and 3 preys in the game. Predators and preys take actions by steps.
+
+    When a prey is located in the other eight locations of the 3 * 3 grids centered around a predator, it can be hunted by that predator. The predators want to hunt the preys, and the preys want to escape from the predators.
+
+    The game ends when all the preys are hunted, or the game reach 10 time steps. Your goal is to get as many preys as possible to be hunted. You can try to hunt preys on your own, or cooperate with other predators and help them.
+
+    Before the predators and preys are placed, the 12 * 12 grids can be represented by the following matrix:
+    [[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0,-1]]
+    The coordinate of top left corner is [0,0], and the coordinate of the bottom right corner is [11,11]. 0 in the matrix means that agents can move to the corresponding position in the grids, and -1 means that agents can not move to the corresponding position, which is the edge of the grids.
+
+    In terms of how you actually perform the action during hunting, you take action for the agent by calling functions. Currently, there are the following functions that can be called.
+    - hunt(target): 
+      In hunt(target), `target` describes the name of the target prey, and the agent will hunt target prey. If a prey is hunted, it will die. The predator can only hunt preys in the other eight locations of the 3 * 3 grids centered around it, which is its hunting range, as shown in the matrix below.
+      [[0, 0, 0],
+       [0, 1, 0],
+       [0, 0, 0]]
+      If the agent is in the position represented by 1 in the matrix, it can only hunt preys in the eight positions represented by 0 in the matrix.
+    - move(direction): 
+      In move(direction), `direction` describes the direction you are going to move to, and it can only be one of the following four lists: "up", "down", "left", "right", which mean four different direction respectively.
+    - stay(): 
+      In stay(), the agent do nothing.
+
+    Call one function at a time, please give a thought before calling these actions .
+    For examples:
+
+    [OPTION 1]
+    Thought: I am now at the coordinate [1,4], and there is no predator or prey at [2,4]. If I move(up), I will reach [0,4], which is not allowed, so I will move(down).
+    Action: move(down)
+
+    [OPTION 2]
+    Thought: I am now at the coordinate [3,3], and prey_1 is at [4,5], and there is no predator or prey at [3,4]. If I move(right), I can hunt prey_1, so I will move(right).
+    Action: move(right)
+
+    [OPTION 3]
+    Thought: I am now at the coordinate [2,1], and prey_1 is at [1,4], and another predator is at [3,5], and there is no predator or prey at [2,2]. If move(right), prey_1 will be hunted more easily, so I will move(right).
+    Action: move(right)
+
+    [OPTION 4]
+    Thought: I am now at the coordinate [3,3], and prey_1 is at [4,4]. I can hunt prey_1 now, so I will hunt(prey_1).
+    Action: hunt(prey_1)
+
+    [OPTION 5]
+    Thought: I am now at the coordinate [1,1], and another two predator are at [1,2] and [2,1] respectively. I cannot move to anywhere or hunt any prey, so I will stay().
+    Action: stay()
+
+    [OPTION 6]
+    Thought: I am now at the coordinate [2,4], and there is no predator or prey at [3,4]. I am not sure what to do, and I prefer to move to the center of the grids, so I will move(down).
+    Action: move(down)
+
+    ${role_description}
+
+    Here is the predators' and preys' action history so far:
+    ${chat_history}
+    ${env_description}
+
+    Pay attention to the predators' and preys' action history and try to figure out their intention of next movement.
+
+    Your current coordinate is ${coordinate}. Other predators' coordinates are ${predator_coordinates}. The preys' coordinates are ${prey_coordinates}. 
+
+    What will you, ${agent_name}, do next?
+
+  prey_prompt: &prey_prompt |-
+    You are in a hunting game as a prey in a 12 * 12 grids, and there are totally 3 predators and 3 preys (including you) in the game. Predators and preys take actions by steps.
+
+    When a prey is located in the other eight locations of the 3 * 3 grids centered around a predator, it can be hunted by that predator. The predators want to hunt the preys, and the preys want to escape from the predators.
+
+    The game ends when all the preys are hunted, or the game reach 10 time steps. Your goal is to survive until the game ends. You can try to escape from predators' hunting and keep away from them.
+
+    Before the predators and preys are placed, the 12 * 12 grids can be represented by the following matrix:
+    [[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1],
+     [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 0,-1]]
+    The coordinate of top left corner is [0,0], and the coordinate of the bottom right corner is [11,11]. 0 in the matrix means that agents can move to the corresponding position in the grids, and -1 means that agents can not move to the corresponding position, which is the edge of the grids.
+
+    In terms of how you actually perform the action during hunting, you take action for the agent by calling functions. Currently, there are the following functions that can be called.
+    - move(direction): 
+      In move(direction), `direction` describes the direction you are going to move to, and it can only be one of the following four lists: "up", "down", "left", "right", which mean four different direction respectively.
+    - stay(): 
+      In stay(), the agent do nothing.
+
+    Call one function at a time, please give a thought before calling these actions .
+    For examples:
+
+    [OPTION 1]
+    Thought: I am now at the coordinate [1,4], and there is no predator or prey at [2,4]. If I move(up), I will reach [0,4], which is not allowed, so I will move(down).
+    Action: move(down)
+
+    [OPTION 2]
+    Thought: I am now at the coordinate [3,3], and predator_1 is at [3,4], and there is no predator or prey at [3,2]. I can be hunted by predator_1 now, and I should run away, so I will move(left).
+    Action: move(left)
+
+    [OPTION 3]
+    Thought: I am now at the coordinate [3,3], and predator_1 is at [3,5], and there is no predator or prey at [3,2]. I should keep away from predator_1, so I will move(left).
+    Action: move(left)
+
+    [OPTION 4]
+    Thought: I am now at the coordinate [1,3], and the three predators are at [1,2], [1,5] and [2,3] respectively. I cannot move to anywhere, so I will stay().
+    Action: stay()
+
+    [OPTION 5]
+    Thought: I am now at the coordinate [1,1], and another two preys are at [1,2] and [2,1] respectively. I cannot move to anywhere, so I will stay().
+    Action: stay()
+
+    [OPTION 6]
+    Thought: I am now at the coordinate [2,4], and there is no predator or prey at [3,4]. I am not sure what to do, and I prefer to move to the center of the grids, so I will move(down).
+    Action: move(down)
+
+    ${role_description}
+
+    Here is the predators' and preys' action history so far:
+    ${chat_history}
+    ${env_description}
+
+    Pay attention to the predators' and preys' action history and try to figure out their intention of next movement.
+
+    Your current coordinate is ${coordinate}. The predators' coordinates are ${predator_coordinates}. Other preys' coordinates are ${prey_coordinates}. 
+
+    What will you, ${agent_name}, do next?
+
+environment:
+  env_type: hunting
+  max_turns: 10
+  grids_dim: 12
+  rule:
+    order:
+      type: sequential
+    visibility:
+      type: oneself
+    selector:
+      type: basic
+    updater:
+      type: hunting_all
+    describer:
+      type: basic
+
+agents:
+  - agent_type: hunting
+    name: predator_1
+    coordinate: [3,2]
+    role_description: |-
+      You are predator_1. Your goal is to get as many preys as possible to be hunted.
+      You need to be sensitive to your own coordinate, other predators' coordinates and the preys' coordinates, and you cannot move to coordinates with other agents. You should try to hunt preys.
+    memory:
+      memory_type: chat_history
+    prompt_template: *predator_prompt
+    llm:
+      llm_type: gpt-4
+      model: 'gpt-4'
+      temperature: 0.7
+      max_tokens: 256
+  - agent_type: hunting
+    name: predator_2
+    coordinate: [6,4]
+    role_description: |-
+      You are predator_2. Your goal is to get as many preys as possible to be hunted.
+      You need to be sensitive to your own coordinate, other predators' coordinates and the preys' coordinates, and you cannot move to coordinates with other agents. You should try to hunt preys.
+    memory:
+      memory_type: chat_history
+    prompt_template: *predator_prompt
+    llm:
+      llm_type: gpt-4
+      model: 'gpt-4'
+      temperature: 0.7
+      max_tokens: 256
+  - agent_type: hunting
+    name: predator_3
+    coordinate: [8,2]
+    role_description: |-
+      You are predator_3. Your goal is to get as many preys as possible to be hunted.
+      You need to be sensitive to your own coordinate, other predators' coordinates and the preys' coordinates, and you cannot move to coordinates with other agents. You should try to hunt preys.
+    memory:
+      memory_type: chat_history
+    prompt_template: *predator_prompt
+    llm:
+      llm_type: gpt-4
+      model: 'gpt-4'
+      temperature: 0.7
+      max_tokens: 256
+  - agent_type: hunting
+    name: prey_1
+    coordinate: [3,7]
+    role_description: |-
+      You are prey_1. Your goal is to survive until the game ends.
+      You need to be sensitive to your own coordinate, the predators' coordinates and other preys' coordinates, and you cannot move to coordinates with other agents. You should try to escape from predators' hunting and keep away from them.
+    memory:
+      memory_type: chat_history
+    prompt_template: *prey_prompt
+    llm:
+      llm_type: gpt-4
+      model: 'gpt-4'
+      temperature: 0.7
+      max_tokens: 256
+  - agent_type: hunting
+    name: prey_2
+    coordinate: [6,9]
+    role_description: |-
+      You are prey_2. Your goal is to survive until the game ends.
+      You need to be sensitive to your own coordinate, the predators' coordinates and other preys' coordinates, and you cannot move to coordinates with other agents. You should try to escape from predators' hunting and keep away from them.
+    memory:
+      memory_type: chat_history
+    prompt_template: *prey_prompt
+    llm:
+      llm_type: gpt-4
+      model: 'gpt-4'
+      temperature: 0.7
+      max_tokens: 256
+  - agent_type: hunting
+    name: prey_3
+    coordinate: [8,7]
+    role_description: |-
+      You are prey_3. Your goal is to survive until the game ends.
+      You need to be sensitive to your own coordinate, the predators' coordinates and other preys' coordinates, and you cannot move to coordinates with other agents. You should try to escape from predators' hunting and keep away from them.
+    memory:
+      memory_type: chat_history
+    prompt_template: *prey_prompt
+    llm:
+      llm_type: gpt-4
+      model: 'gpt-4'
+      temperature: 0.7
+      max_tokens: 256
+
+tools:

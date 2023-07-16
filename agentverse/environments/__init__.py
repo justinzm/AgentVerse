@@ -15,6 +15,8 @@ from .sde_team_given_tests import SdeTeamGivenTestsEnvironment
 from .reflection import ReflectionEnvironment
 
 from .traffic_junction import TrafficEnvironment
+from .combat_task import CombatEnvironment
+from .hunting_task import HuntingEnvironment
 
 
 
