@@ -71,6 +71,8 @@ You also need to export your OpenAI API key as follows
 export OPENAI_API_KEY="your_api_key_here"
 ```
 
+<img width="616" alt="Screen Shot 2023-09-01 at 12 08 57 PM" src="https://github.com/OpenBMB/AgentVerse/assets/11704492/6db1c907-b7fc-42f9-946c-89853a28f386">
+
 
 ### AgentVerse-ProblemSolving Example
 
